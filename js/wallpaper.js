@@ -61,7 +61,7 @@ function getNextImageSet() {
 		return;
 	var artist = player.track.data.artists[0].name;
 	
-	lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100}, function(data) {
+	lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100, autocorrect: 1}, function(data) {
 		img = data.images.image;
 		$.each(img, function(index, image) {
 			if (image.sizes.size[2]["#text"].indexOf(".gif") > -1) {
@@ -74,7 +74,7 @@ function getNextImageSet() {
 		var additional = data.images["@attr"].totalPages - 1;
 		
 		for (var i = 0; i < additional; i++) {
-			lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100, page: i+2}, function(data) {
+			lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100, page: i+2, autocorrect: 1}, function(data) {
 				img = data.images.image;
 				$.each(img, function(index, image) {
 					images.push(image.sizes.size[2]);
