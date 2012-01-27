@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="sp://import/css/api.css" />
+	<link rel="stylesheet" href="sp://import/css/adam.css" />
+	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/jquery-ui.css" />
+</head>
+<body>
+	<div id="container">
+		<div id="row-1" class="row">
+			<div id="box-1" class="box"></div>
+			<div id="box-2" class="box"></div>
+			<div id="box-3" class="box"></div>
+			<div class="clear"></div>
+		</div>
+		<div id="row-2" class="row">
+			<div id="box-4" class="box"></div>
+			<div id="box-5" class="box"></div>
+			<div id="box-6" class="box"></div>
+			<div class="clear"></div>
+		</div>
+		<div id="row-3" class="row">
+			<div id="box-7" class="box"></div>
+			<div id="box-8" class="box"></div>
+			<div id="box-9" class="box"></div>
+			<div class="clear"></div>
+		</div>
+	</div>
+	
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script type="text/javascript">
+		var sp = getSpotifyApi(1);
+	</script>
+	<script src="js/wallpaper.js"></script>
+	<script type="text/javascript">
+		var lastfm = sp.require("js/lastfm");
+		
+		initialize();
+	</script>
+</body>
+</html>

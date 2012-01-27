@@ -1,0 +1,16 @@
+{
+    "BundleType": "Application",
+    "AppIcon": {
+        "36x18": "tutorial.png"
+    },
+    "AppName": {
+        "en": "Wallpaper"
+    },
+    "SupportedLanguages": [
+        "en"
+    ],
+	"RequiredPermissions": [
+		"http://*.audioscrobbler.com",
+		"http://*.last.fm"
+	]
+}
