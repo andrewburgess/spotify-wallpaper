@@ -118,7 +118,7 @@ function processImages() {
 }
 
 function changeImage(index, times) {
-	var src = images[(index + (total * times)) % images.length];
+	var src = images[((index + total) * times) % images.length];
 	preloadImage(src["#text"], {index: index, times: times}, function(params, img) {
 		$("#box-" + params.index).find("img").fadeOut("slow", function() {
 			$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
