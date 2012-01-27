@@ -2,6 +2,10 @@
 .left { float: left; }
 .clear { clear: both; }
 
+body {
+	overflow: hidden;
+}
+
 .row {
 	width: 100%;
 }
@@ -11,4 +15,8 @@
 	width: 33%;
 	height: 100%;
 	overflow: hidden;
+}
+
+.box img {
+	margin: 0 auto;
 }
