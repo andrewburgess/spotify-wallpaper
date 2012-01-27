@@ -6,51 +6,110 @@ var player = models.player;
 var library = models.library;
 var application = models.application;
 
-var images = null;
-
-var boxHeight = $(document).height() / 3.0;
-var boxWidth = $("#box-1").width();
+var images = new Array();
+var currentTimeouts = new Array();
+var total = 100;
 
 function initialize() {
-	$(".row").height($(document).height() / 3.0);
-	
+	setupBoxes();
+
 	getNextImageSet();
+	
+	player.observe(models.EVENT.CHANGE, trackChanged);
 }
 
+function setupBoxes() {
+	var rows = Math.floor($("html").height() / 126) + 1;
+	var cols = Math.floor($("html").width() / 126) + 1;
+	
+	total = rows * cols;
+
+	for (var y = 0; y < rows; y++) {
+		for (var x = 0; x < cols; x++) {
+			var div = $("<div></div>").attr("id", "box-" + (x + (y * cols))).addClass("box");
+			div.css("left", (x * 126));
+			div.css("top", (y * 126));
+			
+			$("#container").append(div);
+		}
+	}
+}
+
+
 function getNextImageSet() {
+	if (!player.track)
+		return;
 	var artist = player.track.data.artists[0].name;
 	
-	lastfm.makeRequest("artist.getImages", {artist: artist}, function(data) {
-		images = data.images.image;
-		for (var i = 0; i < 10; i++) {
-			var rand = Math.floor(Math.random() * images.length);
-			var size = images[rand].sizes.size[5];
-			height = size.height;
-			width = size.width;
-			
-			var image = $("<img></img>").attr("src", size["#text"]);
-			preloadImage(size["#text"], {index: i, height: height, width: width}, function(params, img) {
-				console.log("Loaded " + params.index, $(img));
-
-				if (params.height > params.width) {
-					console.log("height > width " + "H: " + Math.round(height * boxWidth / params.width) + " W: " + boxWidth + " " + params.index);
-					$(img).width(boxWidth);
-					$(img).height(Math.round(params.height * boxWidth / params.width));
-					
-					if ($(img).height() > boxHeight) {
-						diff = $(img).height() - boxHeight;
-						$(img).css("margin-top", -1 * (diff * 0.3));
-					}
-					
-				} else {
-					console.log("width > height " + "H: " + boxHeight + " W: " + Math.round(width * boxHeight / params.height) + " " + params.index);
-					$(img).width(Math.round(params.width * boxHeight / params.height));
-					$(img).height(boxHeight);
-				}
-				
-				$("#box-" + params.index).append(img);
+	lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100}, function(data) {
+		img = data.images.image;
+		$.each(img, function(index, image) {
+			images.push(image.sizes.size[2]);
+		});
+		
+		var additional = data.images["@attr"].totalPages - 1;
+		
+		for (var i = 0; i < additional; i++) {
+			lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100, page: i+2}, function(data) {
+				img = data.images.image;
+				$.each(img, function(index, image) {
+					images.push(image.sizes.size[2]);
+				});
 			});
 		}
+		
+		processImages();
+	});
+}
+
+function trackChanged(event) {
+	if (event.data.curtrack) {
+		for (var i = 0; i < currentTimeouts.length; i++) {
+			clearTimeout(currentTimeouts[i]);
+		}
+		
+		images = new Array();
+		
+		getNextImageSet();
+	}
+}
+
+function processImages() {
+	for (var i = 0; i < total; i++) {
+		var rand = Math.floor(Math.random() * images.length);
+		
+		var src = images[rand];
+		var index = i;
+		if ($("#box-" + index).find("img").length == 0) {
+			var image = $("<img></img>").attr("src", src["#text"]).hide();
+			$("#box-" + index).append(image);
+		}
+		preloadImage(src["#text"], {index: i}, function(params, img) {
+			$("#box-" + params.index).find("img").fadeOut("slow", function() {
+				$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
+			});
+		});
+	}
+	
+	spawnChanges();
+}
+
+function spawnChanges() {
+	for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
+		currentTimeouts.push(setTimeout(changeRandomImage, Math.floor(Math.random() * 10000)));
+	}
+	
+	currentTimeouts.push(setTimeout(spawnChanges, 10000));
+}
+
+function changeRandomImage() {
+	var rand = Math.floor(Math.random() * images.length);
+	var index = Math.floor(Math.random() * total);
+	var src = images[rand];
+	preloadImage(src["#text"], {index: index}, function(params, img) {
+		$("#box-" + params.index).find("img").fadeOut("slow", function() {
+			$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
+		});
 	});
 }
 

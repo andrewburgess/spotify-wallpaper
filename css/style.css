@@ -6,17 +6,15 @@ body {
 	overflow: hidden;
 }
 
-.row {
-	width: 100%;
-}
-
 .box {
-	float:left;
-	width: 33%;
-	height: 100%;
+	width: 126px;
+	height: 126px;
 	overflow: hidden;
+	position: absolute;
 }
 
 .box img {
-	margin: 0 auto;
+	position: absolute;
+	top: 0px;
+	left: 0px;
 }
