@@ -44,7 +44,11 @@ function getNextImageSet() {
 	lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100}, function(data) {
 		img = data.images.image;
 		$.each(img, function(index, image) {
-			images.push(image.sizes.size[2]);
+			if (image.sizes.size[2]["#text"].indexOf(".gif") > -1) {
+				console.log("Yuck, gif");
+			} else {
+				images.push(image.sizes.size[2]);
+			}
 		});
 		
 		var additional = data.images["@attr"].totalPages - 1;
@@ -68,6 +72,7 @@ function trackChanged(event) {
 			clearTimeout(currentTimeouts[i]);
 		}
 		
+		currentTimeouts = new Array();		
 		images = new Array();
 		
 		getNextImageSet();
@@ -75,10 +80,8 @@ function trackChanged(event) {
 }
 
 function processImages() {
-	for (var i = 0; i < total; i++) {
-		var rand = Math.floor(Math.random() * images.length);
-		
-		var src = images[rand];
+	for (var i = 0; i < total; i++) {		
+		var src = images[i % images.length];
 		var index = i;
 		if ($("#box-" + index).find("img").length == 0) {
 			var image = $("<img></img>").attr("src", src["#text"]).hide();
@@ -88,28 +91,21 @@ function processImages() {
 			$("#box-" + params.index).find("img").fadeOut("slow", function() {
 				$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 			});
+			
+			currentTimeouts.push(setTimeout(function() { changeImage(params.index, 1); }, Math.floor(Math.random() * (player.track.duration / 3))));
 		});
 	}
-	
-	spawnChanges();
 }
 
-function spawnChanges() {
-	for (var i = 0; i < Math.floor(Math.random() * 10); i++) {
-		currentTimeouts.push(setTimeout(changeRandomImage, Math.floor(Math.random() * 10000)));
-	}
-	
-	currentTimeouts.push(setTimeout(spawnChanges, 10000));
-}
-
-function changeRandomImage() {
-	var rand = Math.floor(Math.random() * images.length);
-	var index = Math.floor(Math.random() * total);
-	var src = images[rand];
-	preloadImage(src["#text"], {index: index}, function(params, img) {
+function changeImage(index, times) {
+	console.log("position " + index + " for time #" + times);
+	var src = images[(index + (total * times)) % images.length];
+	preloadImage(src["#text"], {index: index, times: times}, function(params, img) {
 		$("#box-" + params.index).find("img").fadeOut("slow", function() {
 			$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 		});
+		
+		currentTimeouts.push(setTimeout(function() { changeImage(params.index, params.times + 1); }, Math.floor(Math.random() * (player.track.duration / 3))));
 	});
 }
 
