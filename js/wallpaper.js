@@ -16,23 +16,43 @@ function initialize() {
 	getNextImageSet();
 	
 	player.observe(models.EVENT.CHANGE, trackChanged);
+	
+	$(window).resize(function() {
+		for (var i = 0; i < currentTimeouts.length; i++) {
+			clearTimeout(currentTimeouts[i]);
+		}
+		
+		$("#container").fadeOut("slow", function() {
+			$("#container").empty();
+			setupBoxes();
+			$("#container").fadeIn(3000);
+			processImages();
+		});
+		
+	});
 }
 
 function setupBoxes() {
-	var rows = Math.floor($("html").height() / 126) + 1;
-	var cols = Math.floor($("html").width() / 126) + 1;
+	var rows = Math.floor($("html").height() / 126);
+	var cols = Math.floor($("html").width() / 126);
+	
+	var extraHeight = ($("html").height() % 126) / rows;
+	var extraWidth = ($("html").width() % 126) / cols;
 	
 	total = rows * cols;
 
 	for (var y = 0; y < rows; y++) {
 		for (var x = 0; x < cols; x++) {
 			var div = $("<div></div>").attr("id", "box-" + (x + (y * cols))).addClass("box");
-			div.css("left", (x * 126));
-			div.css("top", (y * 126));
+			div.css("height", 126 + extraHeight).css("width", 126 + extraWidth);
+			div.css("left", (x * (126 + extraWidth)));
+			div.css("top", (y * (126 + extraHeight)));
 			
 			$("#container").append(div);
 		}
 	}
+	
+	currentTimeouts = new Array(total);
 }
 
 
@@ -92,20 +112,20 @@ function processImages() {
 				$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 			});
 			
-			currentTimeouts.push(setTimeout(function() { changeImage(params.index, 1); }, Math.floor(Math.random() * (player.track.duration / 3))));
+			currentTimeouts[params.index] = setTimeout(function() { changeImage(params.index, 1); }, Math.floor(Math.random() * (player.track.duration / 1.5)));
 		});
 	}
 }
 
 function changeImage(index, times) {
-	console.log("position " + index + " for time #" + times);
 	var src = images[(index + (total * times)) % images.length];
 	preloadImage(src["#text"], {index: index, times: times}, function(params, img) {
 		$("#box-" + params.index).find("img").fadeOut("slow", function() {
 			$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 		});
 		
-		currentTimeouts.push(setTimeout(function() { changeImage(params.index, params.times + 1); }, Math.floor(Math.random() * (player.track.duration / 3))));
+		clearTimeout(currentTimeouts[index]);
+		currentTimeouts[index] = setTimeout(function() { changeImage(params.index, params.times + 1); }, Math.floor(Math.random() * (player.track.duration / 3)));
 	});
 }
 
