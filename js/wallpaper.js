@@ -10,6 +10,8 @@ var images = new Array();
 var currentTimeouts = new Array();
 var total = 100;
 
+var lastArtist = "";
+
 function initialize() {
 	setupBoxes();
 
@@ -60,6 +62,7 @@ function getNextImageSet() {
 	if (!player.track)
 		return;
 	var artist = player.track.data.artists[0].name;
+	lastArtist = player.track.data.artists[0].uri;
 	
 	lastfm.makeRequest("artist.getImages", {artist: artist, limit: 100, autocorrect: 1}, function(data) {
 		img = data.images.image;
@@ -88,14 +91,17 @@ function getNextImageSet() {
 
 function trackChanged(event) {
 	if (event.data.curtrack) {
-		for (var i = 0; i < currentTimeouts.length; i++) {
-			clearTimeout(currentTimeouts[i]);
+		if (player.track.artists[0].uri != lastArtist) {
+	
+			for (var i = 0; i < currentTimeouts.length; i++) {
+				clearTimeout(currentTimeouts[i]);
+			}
+			
+			currentTimeouts = new Array();		
+			images = new Array();
+			
+			getNextImageSet();
 		}
-		
-		currentTimeouts = new Array();		
-		images = new Array();
-		
-		getNextImageSet();
 	}
 }
 

@@ -2,6 +2,8 @@
 .left { float: left; }
 .clear { clear: both; }
 
+html {background-color: #000;}
+
 body {
 	overflow: hidden;
 }
