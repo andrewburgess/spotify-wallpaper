@@ -113,7 +113,7 @@ function processImages() {
 				$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 			});
 			
-			currentTimeouts[params.index] = setTimeout(function() { changeImage(params.index, 1); }, Math.max(1000, Math.floor(Math.random() * (player.track.duration / 3))));
+			currentTimeouts[params.index] = setTimeout(function() { changeImage(params.index, 1); }, Math.max(5000, Math.floor(Math.random() * (player.track.duration / 1.5))));
 		});
 	}
 }
