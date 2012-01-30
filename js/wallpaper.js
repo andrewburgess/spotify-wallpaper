@@ -100,6 +100,7 @@ function trackChanged(event) {
 }
 
 function processImages() {
+	if (images.length == 0) return;
 	for (var i = 0; i < total; i++) {		
 		var src = images[i % images.length];
 		var index = i;
@@ -112,7 +113,7 @@ function processImages() {
 				$("#box-" + params.index).find("img").attr("src", img.src).fadeIn(1500);
 			});
 			
-			currentTimeouts[params.index] = setTimeout(function() { changeImage(params.index, 1); }, Math.floor(Math.random() * (player.track.duration / 1.5)));
+			currentTimeouts[params.index] = setTimeout(function() { changeImage(params.index, 1); }, Math.max(1000, Math.floor(Math.random() * (player.track.duration / 3))));
 		});
 	}
 }
@@ -125,7 +126,7 @@ function changeImage(index, times) {
 		});
 		
 		clearTimeout(currentTimeouts[index]);
-		currentTimeouts[index] = setTimeout(function() { changeImage(params.index, params.times + 1); }, Math.floor(Math.random() * (player.track.duration / 3)));
+		currentTimeouts[index] = setTimeout(function() { changeImage(params.index, params.times + 1); }, Math.max(5000, Math.floor(Math.random() * (player.track.duration / 1.5))));
 	});
 }
 
